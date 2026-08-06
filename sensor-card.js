@@ -180,6 +180,7 @@ class ClimateDashboardCard extends HTMLElement {
     var arcColor = this.temperatureColor(temperatureValue);
     var humidityColor = this.humidityColor(humidityValue);
     var batteryColor = batteryValue !== null && batteryValue >= 80 ? "#2eaa60" : batteryValue !== null && batteryValue >= 30 ? "#e6a700" : "#d94c4c";
+    var batteryIcon = batteryValue === null ? "mdi:battery-unknown" : batteryValue >= 95 ? "mdi:battery" : batteryValue >= 80 ? "mdi:battery-80" : batteryValue >= 60 ? "mdi:battery-60" : batteryValue >= 40 ? "mdi:battery-40" : batteryValue >= 20 ? "mdi:battery-20" : "mdi:battery-alert";
     var definitions = [["co2", "CO₂", "ppm"], ["tvoc", "TVOC", "ppb"], ["pressure", "Druk", "hPa"], ["dew_point", "Dauwpunt", "°C"]];
     var extras = definitions.filter((item) => this.config[item[0]]).map((item) => {
       var key = item[0];
@@ -187,7 +188,7 @@ class ClimateDashboardCard extends HTMLElement {
     }).join("");
 
     this.shadowRoot.innerHTML = `<style>${CARD_CSS}</style><ha-card>
-      <header><h2>${escapeHtml(this.config.title)}</h2>${this.config.battery ? `<button class="battery" data-entity="${escapeHtml(this.config.battery)}" style="color:${batteryColor}"><ha-icon icon="mdi:battery"></ha-icon>${this.text(battery, "%", 0)}</button>` : ""}</header>
+      <header><h2>${escapeHtml(this.config.title)}</h2>${this.config.battery ? `<button class="battery" data-entity="${escapeHtml(this.config.battery)}" style="color:${batteryColor}"><ha-icon icon="${batteryIcon}"></ha-icon>${this.text(battery, "%", 0)}</button>` : ""}</header>
       <button class="dial" style="top:${this.config.dial_position}%;width:${dialSize}px;height:${dialSize}px" data-entity="${escapeHtml(this.config.temperature)}"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="50" pathLength="100"></circle>${this.arcSegments(temperatureProgress)}${this.zeroMarker()}${temperatureValue === null ? "" : this.currentMarker(temperatureProgress, arcColor)}</svg>
       <span class="values"><strong style="color:${arcColor}">${this.text(temp, "°C", 1)}</strong>${this.config.humidity ? `<span style="color:${humidityColor}"><ha-icon icon="mdi:water-percent" style="color:${humidityColor}"></ha-icon>${this.text(humidity, "%", 0)}</span>` : ""}</span></button><footer>${extras}</footer></ha-card>`;
     this.shadowRoot.querySelectorAll("[data-entity]").forEach((node) => {
